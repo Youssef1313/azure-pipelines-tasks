@@ -147,12 +147,17 @@ export class dotNetExe {
     }
 
     private getIsMicrosoftTestingPlatform(): boolean {
-        if (!tl.exist("dotnet.config")) {
+        if (!tl.exist("global.json")) {
             return false;
         }
 
-        let dotnetConfig = fs.readFileSync("dotnet.config", 'utf8');
-        return toml.parse(dotnetConfig).dotnet?.test?.runner?.name === 'Microsoft.Testing.Platform';
+        let globalJsonContent = fs.readFileSync("global.json", 'utf8');
+        if (!globalJsonContent.length) {
+             return false;
+        }
+
+        const globalJson = JSON5.parse(globalJsonContent);
+        return globalJson?.test?.runner === 'Microsoft.Testing.Platform';
     }
 
     private async executeTestCommand(): Promise<void> {
